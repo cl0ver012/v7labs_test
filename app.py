@@ -36,10 +36,85 @@ if 'agent' not in st.session_state:
     if not os.getenv("ANTHROPIC_API_KEY"):
         os.environ["ANTHROPIC_API_KEY"] = "test-key"
     st.session_state.agent = ChartGenerationAgent()
+if 'auto_execute_query' not in st.session_state:
+    st.session_state.auto_execute_query = None
 
 # Title and description
 st.title("📊 AI Chart Generator")
 st.markdown("Generate beautiful charts from natural language descriptions")
+
+# Check if there's an auto-execute query from example button
+if st.session_state.auto_execute_query:
+    prompt = st.session_state.auto_execute_query
+    st.session_state.auto_execute_query = None  # Clear the flag
+    
+    # Add user message
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    
+    # Generate the chart automatically
+    with st.spinner("Generating chart..."):
+        # Generate unique filenames in results folder (use absolute paths)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        results_abs = os.path.abspath(RESULTS_PATH)
+        chart_path = os.path.join(results_abs, f"chart_{timestamp}.html")
+        code_path = os.path.join(results_abs, f"chart_{timestamp}.py")
+        
+        # Ensure results folder exists
+        os.makedirs(results_abs, exist_ok=True)
+        
+        try:
+            # Call the agent
+            result = st.session_state.agent.generate_chart(
+                chart_description=prompt,
+                data_topic=prompt[:50],  # Use description as topic
+                data_rows=20,
+                output_chart_path=chart_path,
+                output_code_path=code_path
+            )
+            
+            # Process result
+            if result['success']:
+                response = f"""✅ **Chart generated successfully!**
+
+**Chart Type:** {result.get('chart_type', 'Auto-detected')}  
+**Data Source:** {result.get('data_source', 'Synthetic data')}  
+**Files Created:**
+- Chart: `{chart_path}`
+- Code: `{code_path}`
+
+You can find the generated files in the project directory."""
+                
+                # Add assistant response with file paths
+                message_data = {
+                    "role": "assistant", 
+                    "content": response,
+                    "chart_path": chart_path,
+                    "code_path": code_path
+                }
+                
+                # If warnings exist, add them
+                if result.get('warnings'):
+                    response += "\n\n⚠️ **Warnings:**\n"
+                    for warning in result['warnings']:
+                        response += f"- {warning[:100]}...\n"
+                    message_data["content"] = response
+                
+            else:
+                response = "❌ **Failed to generate chart**\n\n"
+                if result.get('errors'):
+                    response += "**Errors:**\n"
+                    for error in result['errors']:
+                        response += f"- {error}\n"
+                message_data = {"role": "assistant", "content": response}
+            
+            st.session_state.messages.append(message_data)
+            
+        except Exception as e:
+            error_msg = f"❌ **Error:** {str(e)}"
+            st.session_state.messages.append({"role": "assistant", "content": error_msg})
+    
+    # Rerun to show the new messages
+    st.rerun()
 
 # Display chat history
 for message in st.session_state.messages:
@@ -53,10 +128,34 @@ for message in st.session_state.messages:
             try:
                 with open(message["chart_path"], 'r', encoding='utf-8') as f:
                     chart_html = f.read()
-                # Display the chart with responsive sizing
+                
+                # Modify HTML to make the chart responsive
+                # Replace fixed dimensions with responsive ones
+                modified_html = chart_html.replace(
+                    'style="width:1280px; height:720px; "',
+                    'style="width:100%; height:100%; min-height:720px; "'
+                )
+                # Also handle variations in spacing
+                modified_html = modified_html.replace(
+                    'style="width:1280px; height:720px;"',
+                    'style="width:100%; height:100%; min-height:720px;"'
+                )
+                
+                # Add viewport meta tag and responsive CSS if not present
+                if '<style>' not in modified_html:
+                    modified_html = modified_html.replace(
+                        '</head>',
+                        '''<style>
+                        body { margin: 0; padding: 0; overflow: hidden; }
+                        .chart-container { width: 100% !important; height: 100% !important; }
+                        </style>
+                        </head>'''
+                    )
+                
+                # Display the chart with proper height
                 st.components.v1.html(
-                    chart_html, 
-                    height=650,  # Increased height for better visibility
+                    modified_html, 
+                    height=750,  # Slightly more than 720px to ensure full visibility
                     scrolling=False,
                     width=None  # Use full container width
                 )
@@ -154,10 +253,34 @@ You can find the generated files in the project directory."""
                     try:
                         with open(actual_chart_path, 'r', encoding='utf-8') as f:
                             chart_html = f.read()
-                        # Display the interactive chart with responsive sizing
+                        
+                        # Modify HTML to make the chart responsive
+                        # Replace fixed dimensions with responsive ones
+                        modified_html = chart_html.replace(
+                            'style="width:1280px; height:720px; "',
+                            'style="width:100%; height:100%; min-height:720px; "'
+                        )
+                        # Also handle variations in spacing
+                        modified_html = modified_html.replace(
+                            'style="width:1280px; height:720px;"',
+                            'style="width:100%; height:100%; min-height:720px;"'
+                        )
+                        
+                        # Add viewport meta tag and responsive CSS if not present
+                        if '<style>' not in modified_html:
+                            modified_html = modified_html.replace(
+                                '</head>',
+                                '''<style>
+                                body { margin: 0; padding: 0; overflow: hidden; }
+                                .chart-container { width: 100% !important; height: 100% !important; }
+                                </style>
+                                </head>'''
+                            )
+                        
+                        # Display the interactive chart with proper height
                         st.components.v1.html(
-                            chart_html, 
-                            height=650,  # Increased height for better visibility
+                            modified_html, 
+                            height=750,  # Slightly more than 720px to ensure full visibility
                             scrolling=False,
                             width=None  # Use full container width
                         )
@@ -209,8 +332,8 @@ with st.sidebar:
     
     for example in examples:
         if st.button(f"📝 {example}", key=example):
-            # Clear the chat input and add the example
-            st.session_state.messages.append({"role": "user", "content": example})
+            # Set the example to be auto-executed
+            st.session_state.auto_execute_query = example
             st.rerun()
     
     st.markdown("---")

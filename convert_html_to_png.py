@@ -49,7 +49,12 @@ def setup_chrome_driver():
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
-        options.add_argument(f'--window-size={CHART_WIDTH+100},{CHART_HEIGHT+100}')  # Add padding
+        # Set a larger window to ensure full chart capture
+        options.add_argument(f'--window-size={CHART_WIDTH+200},{CHART_HEIGHT+200}')
+        # Force device scale factor to 1
+        options.add_argument('--force-device-scale-factor=1')
+        # Disable scrollbars
+        options.add_argument('--hide-scrollbars')
         
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=options)
@@ -63,7 +68,12 @@ def setup_chrome_driver():
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
-        options.add_argument(f'--window-size={CHART_WIDTH+100},{CHART_HEIGHT+100}')  # Add padding
+        # Set a larger window to ensure full chart capture
+        options.add_argument(f'--window-size={CHART_WIDTH+200},{CHART_HEIGHT+200}')
+        # Force device scale factor to 1
+        options.add_argument('--force-device-scale-factor=1')
+        # Disable scrollbars
+        options.add_argument('--hide-scrollbars')
         
         try:
             driver = webdriver.Chrome(options=options)
@@ -112,11 +122,74 @@ def convert_html_to_png(html_file: str, output_file: Optional[str] = None) -> bo
         except:
             time.sleep(3)  # Fallback wait
         
-        # Set viewport to exact chart size
-        driver.set_window_size(CHART_WIDTH, CHART_HEIGHT)
+        # Inject JavaScript to ensure the chart is fully visible
+        driver.execute_script("""
+            // Find the chart container
+            var chartContainers = document.querySelectorAll('.chart-container');
+            if (chartContainers.length > 0) {
+                var container = chartContainers[0];
+                // Set container to exact dimensions
+                container.style.width = '1280px';
+                container.style.height = '720px';
+                // Remove any margins or padding from body
+                document.body.style.margin = '0';
+                document.body.style.padding = '0';
+                document.body.style.overflow = 'hidden';
+                // Ensure chart is at top-left
+                container.style.position = 'absolute';
+                container.style.top = '0';
+                container.style.left = '0';
+            }
+            
+            // Also handle the main div with chart ID
+            var divs = document.querySelectorAll('div[id]');
+            for (var i = 0; i < divs.length; i++) {
+                var div = divs[i];
+                if (div.id && div.id.length === 32) {  // PyEcharts generates 32-char IDs
+                    div.style.width = '1280px';
+                    div.style.height = '720px';
+                    div.style.position = 'absolute';
+                    div.style.top = '0';
+                    div.style.left = '0';
+                }
+            }
+            
+            // Force ECharts to resize
+            if (window.echarts) {
+                var charts = echarts.getInstanceByDom(document.querySelector('.chart-container') || document.querySelector('div[id]'));
+                if (charts) {
+                    charts.resize({width: 1280, height: 720});
+                }
+            }
+        """)
         
-        # Take screenshot
-        driver.save_screenshot(output_file)
+        # Give it a moment to apply the styles
+        time.sleep(1)
+        
+        # Set window to exact size needed (with small buffer for browser chrome)
+        driver.set_window_size(CHART_WIDTH + 50, CHART_HEIGHT + 50)
+        
+        # Try to find and screenshot just the chart element
+        try:
+            # Try to find the chart container
+            chart_element = driver.find_element(By.CLASS_NAME, "chart-container")
+            chart_element.screenshot(output_file)
+        except:
+            # If no chart container, try to find the main chart div
+            try:
+                # Find div with 32-character ID (PyEcharts pattern)
+                chart_divs = driver.find_elements(By.TAG_NAME, "div")
+                for div in chart_divs:
+                    div_id = div.get_attribute("id")
+                    if div_id and len(div_id) == 32:
+                        div.screenshot(output_file)
+                        break
+                else:
+                    # Fallback to full page screenshot
+                    driver.save_screenshot(output_file)
+            except:
+                # Final fallback to full page screenshot
+                driver.save_screenshot(output_file)
         
         # Ensure exact dimensions using PIL
         if PIL_AVAILABLE:
