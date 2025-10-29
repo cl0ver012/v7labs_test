@@ -53,8 +53,13 @@ for message in st.session_state.messages:
             try:
                 with open(message["chart_path"], 'r', encoding='utf-8') as f:
                     chart_html = f.read()
-                # Display the chart in an iframe
-                st.components.v1.html(chart_html, height=500, scrolling=True)
+                # Display the chart with responsive sizing
+                st.components.v1.html(
+                    chart_html, 
+                    height=650,  # Increased height for better visibility
+                    scrolling=False,
+                    width=None  # Use full container width
+                )
             except Exception as e:
                 st.error(f"Could not display chart: {e}")
             
@@ -149,8 +154,13 @@ You can find the generated files in the project directory."""
                     try:
                         with open(actual_chart_path, 'r', encoding='utf-8') as f:
                             chart_html = f.read()
-                        # Display the interactive chart
-                        st.components.v1.html(chart_html, height=500, scrolling=True)
+                        # Display the interactive chart with responsive sizing
+                        st.components.v1.html(
+                            chart_html, 
+                            height=650,  # Increased height for better visibility
+                            scrolling=False,
+                            width=None  # Use full container width
+                        )
                     except Exception as e:
                         st.error(f"Could not display chart: {e}")
                 
