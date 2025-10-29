@@ -83,6 +83,9 @@ Output ONLY the Python code, no explanations."""
         # Format data for prompt
         data_str = json.dumps(data, indent=2)
         
+        # Normalize output file path for cross-platform compatibility
+        output_file_normalized = output_file.replace('\\', '/')
+        
         user_prompt = f"""Generate PyEcharts code for: {chart_description}
 
 Data to visualize:
@@ -92,7 +95,7 @@ Requirements:
 1. Convert the JSON data to simple Python lists (x_data, y_data, etc.)
 2. Use appropriate chart type (Line, Bar, Pie, Scatter, etc.)
 3. Follow EXACT PyEcharts gallery structure
-4. Set output to: {output_file}
+4. Set output to: {output_file_normalized}
 5. Add title based on description
 6. NO pandas, NO csv reading, NO complex imports"""
         
@@ -149,6 +152,9 @@ y_data = [820, 932, 901, 934, 1290, 1330, 1320]
 
 def generate_fallback_code(data: Dict, description: str, output_file: str, chart_type: str = None) -> str:
     """Generate simple fallback PyEcharts code following exact gallery structure."""
+    
+    # Normalize output file path for cross-platform compatibility
+    output_file = output_file.replace('\\', '/')
     
     # Get first two data arrays from the dict
     keys = list(data.keys())

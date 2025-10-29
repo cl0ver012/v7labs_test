@@ -55,9 +55,11 @@ def save_outputs_node(state: ChartAgentState) -> Dict[str, Any]:
     
     # Replace the output file path in the code
     import re
+    # Convert backslashes to forward slashes for cross-platform compatibility
+    chart_path_normalized = chart_path.replace('\\', '/')
     generated_code = re.sub(
         r'\.render\(["\'].*?["\']\)',
-        f'.render("{chart_path}")',
+        f'.render("{chart_path_normalized}")',
         generated_code
     )
     
