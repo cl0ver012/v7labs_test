@@ -1,0 +1,15 @@
+# Core
+langchain
+langchain-anthropic
+langgraph
+anthropic
+python-dotenv
+
+# Visualization
+pyecharts
+
+# Web UI
+streamlit
+
+# Data
+pandas
