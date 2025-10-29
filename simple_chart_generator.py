@@ -90,18 +90,8 @@ from pyecharts import options as opts
 from pyecharts.charts import Line  # or Bar, Pie, etc.
 from pyecharts.globals import ThemeType  # If using theme
 
-x_data = [...]
-y_data = [...]
+# Chart implementation here
 
-(
-    Line(init_opts=opts.InitOpts(theme=ThemeType.ROMANTIC))  # With theme
-    .add_xaxis(x_data)
-    .add_yaxis("series_name", y_data)
-    .set_global_opts(
-        title_opts=opts.TitleOpts(title="Title")
-    )
-    .render("output.html")
-)
 ```
 
 Output ONLY the Python code, no explanations."""
@@ -141,6 +131,7 @@ You can generate the code by updating the code with your data and use the random
 
 And while you are generating code, use simple, short and professional title and labels for the chart.
 When it gets longer, it looks not good and professional.
+Do not not generate chart title. I mean just keep title of the chart empty string.
 """
         else:
             # Provide a default example structure

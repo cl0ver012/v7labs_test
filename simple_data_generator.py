@@ -52,7 +52,8 @@ def generate_data(
         - Include numeric values for y-axis
         - Add any other relevant fields
         - Make the data interesting with trends and variations
-        
+        - Do not make that complicated data with so many labels or stuffs like that. Those data makes the chart looks not good.
+
         Output format: JSON object with arrays for each field
         Example structure: {{"months": ["Jan", "Feb", ...], "sales": [100, 120, ...], "category": [...]}}"""
         
