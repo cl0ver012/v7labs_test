@@ -1,3 +1,6 @@
+# Full requirements including PNG conversion capabilities
+# Install with: pip install -r requirements-full.txt
+
 # Core dependencies
 streamlit>=1.29.0
 pyecharts>=2.0.0
@@ -22,7 +25,7 @@ faker>=20.0.0
 pydantic>=2.0.0
 typing-extensions>=4.8.0
 
-# Optional: For PNG conversion (uncomment if needed)
-# selenium>=4.15.0
-# webdriver-manager>=4.0.0
-# pillow>=10.0.0
+# PNG conversion
+selenium>=4.15.0
+webdriver-manager>=4.0.0
+pillow>=10.0.0
