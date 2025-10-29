@@ -74,22 +74,44 @@ if st.session_state.auto_execute_query:
             
             # Process result
             if result['success']:
+                # Get actual output file paths
+                actual_chart_path = None
+                actual_code_path = None
+                
+                if result.get('output_files') and result['output_files'].get('chart'):
+                    actual_chart_path = result['output_files']['chart']
+                elif os.path.exists(chart_path):
+                    actual_chart_path = chart_path
+                elif os.path.exists(chart_path.replace('results/', '')):
+                    actual_chart_path = chart_path.replace('results/', '')
+                
+                if result.get('output_files') and result['output_files'].get('code'):
+                    actual_code_path = result['output_files']['code']
+                elif os.path.exists(code_path):
+                    actual_code_path = code_path
+                elif os.path.exists(code_path.replace('results/', '')):
+                    actual_code_path = code_path.replace('results/', '')
+                
+                # Use actual paths in response
+                display_chart_path = actual_chart_path if actual_chart_path else chart_path
+                display_code_path = actual_code_path if actual_code_path else code_path
+                
                 response = f"""✅ **Chart generated successfully!**
 
 **Chart Type:** {result.get('chart_type', 'Auto-detected')}  
 **Data Source:** {result.get('data_source', 'Synthetic data')}  
 **Files Created:**
-- Chart: `{chart_path}`
-- Code: `{code_path}`
+- Chart: `{os.path.basename(display_chart_path)}`
+- Code: `{os.path.basename(display_code_path)}`
 
 You can find the generated files in the project directory."""
                 
-                # Add assistant response with file paths
+                # Add assistant response with actual file paths
                 message_data = {
                     "role": "assistant", 
                     "content": response,
-                    "chart_path": chart_path,
-                    "code_path": code_path
+                    "chart_path": display_chart_path,
+                    "code_path": display_code_path
                 }
                 
                 # If warnings exist, add them
@@ -121,8 +143,8 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
         # Display the actual chart visualization if available
-        if "chart_path" in message and os.path.exists(message["chart_path"]):
-            st.success(f"📈 Chart generated: {message['chart_path']}")
+        if "chart_path" in message and message["chart_path"] and os.path.exists(message["chart_path"]):
+            st.success(f"📈 Chart generated: {os.path.basename(message['chart_path'])}")
             
             # Display the actual chart from HTML file
             try:
@@ -163,11 +185,14 @@ for message in st.session_state.messages:
                 st.error(f"Could not display chart: {e}")
             
             # Show the generated code in an expander
-            if "code_path" in message and os.path.exists(message["code_path"]):
+            if "code_path" in message and message["code_path"] and os.path.exists(message["code_path"]):
                 with st.expander("View Generated Code"):
                     with open(message["code_path"], 'r') as f:
                         code = f.read()
                     st.code(code, language="python")
+        elif "chart_path" in message and message["chart_path"]:
+            # Debug: Show why chart is not displaying
+            st.warning(f"⚠️ Chart file not found: {message['chart_path']}")
 
 # Chat input
 if prompt := st.chat_input("Describe the chart you want (e.g., 'Create a bar chart showing monthly sales')"):
@@ -212,12 +237,30 @@ if prompt := st.chat_input("Describe the chart you want (e.g., 'Create a bar cha
 
 You can find the generated files in the project directory."""
                     
-                    # Add assistant response with file paths
+                    # Check for the actual output files
+                    actual_chart_path = None
+                    actual_code_path = None
+                    
+                    if result.get('output_files') and result['output_files'].get('chart'):
+                        actual_chart_path = result['output_files']['chart']
+                    elif os.path.exists(chart_path):
+                        actual_chart_path = chart_path
+                    elif os.path.exists(chart_path.replace('results/', '')):
+                        actual_chart_path = chart_path.replace('results/', '')
+                    
+                    if result.get('output_files') and result['output_files'].get('code'):
+                        actual_code_path = result['output_files']['code']
+                    elif os.path.exists(code_path):
+                        actual_code_path = code_path
+                    elif os.path.exists(code_path.replace('results/', '')):
+                        actual_code_path = code_path.replace('results/', '')
+                    
+                    # Add assistant response with actual file paths
                     message_data = {
                         "role": "assistant", 
                         "content": response,
-                        "chart_path": chart_path,
-                        "code_path": code_path
+                        "chart_path": actual_chart_path if actual_chart_path else chart_path,
+                        "code_path": actual_code_path if actual_code_path else code_path
                     }
                     
                     # If warnings exist, add them
@@ -237,16 +280,6 @@ You can find the generated files in the project directory."""
                 
                 st.session_state.messages.append(message_data)
                 st.markdown(response)
-                
-                # Display the actual chart visualization
-                # Check for the chart in both locations (old and new)
-                actual_chart_path = None
-                if result.get('output_files') and result['output_files'].get('chart'):
-                    actual_chart_path = result['output_files']['chart']
-                elif os.path.exists(chart_path):
-                    actual_chart_path = chart_path
-                elif os.path.exists(chart_path.replace('results/', '')):
-                    actual_chart_path = chart_path.replace('results/', '')
                 
                 if result['success'] and actual_chart_path and os.path.exists(actual_chart_path):
                     st.success(f"📈 Chart generated: {os.path.basename(actual_chart_path)}")
@@ -287,15 +320,7 @@ You can find the generated files in the project directory."""
                     except Exception as e:
                         st.error(f"Could not display chart: {e}")
                 
-                # Show the code if generated
-                actual_code_path = None
-                if result.get('output_files') and result['output_files'].get('code'):
-                    actual_code_path = result['output_files']['code']
-                elif os.path.exists(code_path):
-                    actual_code_path = code_path
-                elif os.path.exists(code_path.replace('results/', '')):
-                    actual_code_path = code_path.replace('results/', '')
-                    
+                # Show the code if generated (actual_code_path already found above)
                 if result['success'] and actual_code_path and os.path.exists(actual_code_path):
                     with st.expander("View Generated Code"):
                         with open(actual_code_path, 'r') as f:
