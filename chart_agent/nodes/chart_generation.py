@@ -8,8 +8,15 @@ import datetime
 import subprocess
 import logging
 from typing import Dict, Any
+from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from chart_agent.models.agent_state import ChartAgentState, ProcessingStep
+
+# Load environment variables
+load_dotenv()
+
+# Configuration
+RESULTS_PATH = os.getenv('RESULTS_PATH', os.path.join(os.getcwd(), 'results'))
 
 logger = logging.getLogger(__name__)
 
@@ -40,11 +47,11 @@ def save_outputs_node(state: ChartAgentState) -> Dict[str, Any]:
     
     # Save code file
     code_filename = f"chart_{timestamp}.py"
-    code_path = f"/home/ilya/Desktop/v7labs_test/results/{code_filename}"
+    code_path = os.path.join(RESULTS_PATH, code_filename)
     
     # Update code to use correct output path
     chart_filename = f"chart_{timestamp}.html"
-    chart_path = f"/home/ilya/Desktop/v7labs_test/results/{chart_filename}"
+    chart_path = os.path.join(RESULTS_PATH, chart_filename)
     
     # Replace the output file path in the code
     import re
@@ -70,7 +77,7 @@ def save_outputs_node(state: ChartAgentState) -> Dict[str, Any]:
             capture_output=True,
             text=True,
             timeout=10,
-            cwd='/home/ilya/Desktop/v7labs_test/results'
+            cwd=RESULTS_PATH
         )
         
         if result.returncode == 0:

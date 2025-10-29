@@ -12,10 +12,13 @@ from langchain_core.messages import SystemMessage, HumanMessage
 # Load environment variables
 load_dotenv()
 
+# Configuration
+DEFAULT_MODEL = os.getenv('CLAUDE_MODEL', 'claude-3-5-haiku-latest')
+
 def generate_data(
     description: str,
     num_rows: int = 20,
-    model: str = "claude-3-haiku-20240307",
+    model: Optional[str] = None,
     temperature: float = 0.7
 ) -> Dict[str, Any]:
     """
@@ -33,7 +36,7 @@ def generate_data(
     
     try:
         # Initialize LLM
-        llm = ChatAnthropic(model=model, temperature=temperature)
+        llm = ChatAnthropic(model=model or DEFAULT_MODEL, temperature=temperature)
         
         # Simple, clear prompt
         system_prompt = """Generate data in JSON format. 
@@ -89,7 +92,7 @@ def generate_data(
 def generate_data_as_text(
     description: str,
     num_rows: int = 20,
-    model: str = "claude-3-haiku-20240307",
+    model: Optional[str] = None,
     temperature: float = 0.7
 ) -> str:
     """
@@ -98,7 +101,7 @@ def generate_data_as_text(
     Returns:
         String representation of the data
     """
-    data = generate_data(description, num_rows, model, temperature)
+    data = generate_data(description, num_rows, model or DEFAULT_MODEL, temperature)
     return json.dumps(data, indent=2)
 
 

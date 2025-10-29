@@ -13,6 +13,10 @@ from chart_agent.models.agent_state import ChartAgentState, ProcessingStep
 # Load environment variables
 load_dotenv()
 
+# Configuration
+PROJECT_ROOT = os.getenv('PROJECT_ROOT', os.getcwd())
+RESULTS_PATH = os.getenv('RESULTS_PATH', os.path.join(os.getcwd(), 'results'))
+
 logger = logging.getLogger(__name__)
 
 
@@ -29,7 +33,8 @@ def generate_code_node(state: ChartAgentState) -> Dict[str, Any]:
     try:
         # Import the simple chart generator
         import sys
-        sys.path.append('/home/ilya/Desktop/v7labs_test')
+        if PROJECT_ROOT not in sys.path:
+            sys.path.append(PROJECT_ROOT)
         from simple_chart_generator import generate_chart_code
         
         # Get first example if available

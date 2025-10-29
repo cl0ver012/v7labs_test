@@ -12,8 +12,13 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+# Configuration
+PROJECT_ROOT = os.getenv('PROJECT_ROOT', os.getcwd())
+RESULTS_PATH = os.getenv('RESULTS_PATH', os.path.join(os.getcwd(), 'results'))
+
 # Add the project to path
-sys.path.append('/home/ilya/Desktop/v7labs_test')
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)
 
 from chart_agent.main import ChartGenerationAgent
 
@@ -74,11 +79,11 @@ if prompt := st.chat_input("Describe the chart you want (e.g., 'Create a bar cha
         with st.spinner("Generating chart..."):
             # Generate unique filenames in results folder
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            chart_path = f"results/chart_{timestamp}.html"
-            code_path = f"results/chart_{timestamp}.py"
+            chart_path = os.path.join(RESULTS_PATH, f"chart_{timestamp}.html")
+            code_path = os.path.join(RESULTS_PATH, f"chart_{timestamp}.py")
             
             # Ensure results folder exists
-            os.makedirs("results", exist_ok=True)
+            os.makedirs(RESULTS_PATH, exist_ok=True)
             
             try:
                 # Call the agent

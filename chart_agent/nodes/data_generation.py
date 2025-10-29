@@ -13,6 +13,10 @@ from chart_agent.models.agent_state import ChartAgentState, ProcessingStep
 # Load environment variables
 load_dotenv()
 
+# Configuration
+RESULTS_PATH = os.getenv('RESULTS_PATH', os.path.join(os.getcwd(), 'results'))
+PROJECT_ROOT = os.getenv('PROJECT_ROOT', os.getcwd())
+
 logger = logging.getLogger(__name__)
 
 
@@ -25,7 +29,7 @@ def analyze_request_node(state: ChartAgentState) -> Dict[str, Any]:
     request = state["request"]
     
     # Ensure results directory exists
-    os.makedirs("/home/ilya/Desktop/v7labs_test/results", exist_ok=True)
+    os.makedirs(RESULTS_PATH, exist_ok=True)
     
     # Build message about the analysis
     message_content = f"""Request Analysis Complete:
@@ -59,7 +63,8 @@ def generate_data_node(state: ChartAgentState) -> Dict[str, Any]:
     try:
         # Import the simple data generator
         import sys
-        sys.path.append('/home/ilya/Desktop/v7labs_test')
+        if PROJECT_ROOT not in sys.path:
+            sys.path.append(PROJECT_ROOT)
         from simple_data_generator import generate_data
         
         # Create description for data generation
@@ -79,7 +84,7 @@ def generate_data_node(state: ChartAgentState) -> Dict[str, Any]:
         import datetime
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         json_filename = f"data_{timestamp}.json"
-        json_path = f"/home/ilya/Desktop/v7labs_test/results/{json_filename}"
+        json_path = os.path.join(RESULTS_PATH, json_filename)
         
         with open(json_path, 'w') as f:
             json.dump(data, f, indent=2)

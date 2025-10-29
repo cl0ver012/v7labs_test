@@ -14,12 +14,19 @@ from chart_agent.models.agent_state import ChartAgentState, ProcessingStep
 # Load environment variables
 load_dotenv()
 
+# Configuration
+DEFAULT_MODEL = os.getenv('CLAUDE_MODEL', 'claude-3-5-haiku-latest')
+GALLERY_PATH = os.getenv('GALLERY_PATH', os.path.join(os.getcwd(), 'pyecharts-gallery'))
+
 logger = logging.getLogger(__name__)
 
 
-def get_available_chart_types(gallery_path: str = "/home/ilya/Desktop/v7labs_test/pyecharts-gallery") -> List[str]:
+def get_available_chart_types(gallery_path: str = None) -> List[str]:
     """Get ALL chart types from ALL folder names in pyecharts-gallery."""
     chart_types = []
+    
+    if not gallery_path:
+        gallery_path = GALLERY_PATH
     
     if os.path.exists(gallery_path):
         for item in os.listdir(gallery_path):
@@ -37,7 +44,7 @@ def select_chart_type_with_llm(chart_description: str, available_types: List[str
     """Use LLM to select the most relevant chart type."""
     try:
         llm = ChatAnthropic(
-            model="claude-3-haiku-20240307",
+            model=DEFAULT_MODEL,
             temperature=0.1
         )
         
@@ -171,8 +178,10 @@ def select_chart_type_with_llm(chart_description: str, available_types: List[str
         return "Line"
 
 
-def get_example_from_folder(chart_type: str, gallery_path: str = "/home/ilya/Desktop/v7labs_test/pyecharts-gallery") -> str:
+def get_example_from_folder(chart_type: str, gallery_path: str = None) -> str:
     """Get an example Python file from the selected chart type folder."""
+    if not gallery_path:
+        gallery_path = GALLERY_PATH
     folder_path = os.path.join(gallery_path, chart_type)
     
     if not os.path.exists(folder_path):

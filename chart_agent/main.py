@@ -15,6 +15,9 @@ from chart_agent.core.graph import setup_chart_generation_graph
 # Load environment variables
 load_dotenv()
 
+# Configuration
+RESULTS_PATH = os.getenv('RESULTS_PATH', os.path.join(os.getcwd(), 'results'))
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -53,8 +56,8 @@ class ChartGenerationAgent:
         data_details: Optional[str] = None,
         data_rows: Optional[int] = 30,
         input_data_path: Optional[str] = None,
-        output_chart_path: str = "results/output_chart.html",
-        output_code_path: str = "results/generated_chart.py",
+        output_chart_path: str = None,
+        output_code_path: str = None,
         chart_type_hint: Optional[str] = None
     ) -> Dict[str, Any]:
         """
@@ -74,6 +77,12 @@ class ChartGenerationAgent:
             Dictionary containing the results of the chart generation
         """
         # Create the request
+        # Use default paths if not specified
+        if not output_chart_path:
+            output_chart_path = os.path.join(RESULTS_PATH, "output_chart.html")
+        if not output_code_path:
+            output_code_path = os.path.join(RESULTS_PATH, "generated_chart.py")
+        
         request = ChartRequest(
             chart_description=chart_description,
             data_topic=data_topic,
@@ -145,8 +154,8 @@ class ChartGenerationAgent:
         data_details: Optional[str] = None,
         data_rows: Optional[int] = 30,
         input_data_path: Optional[str] = None,
-        output_chart_path: str = "results/output_chart.html",
-        output_code_path: str = "results/generated_chart.py",
+        output_chart_path: str = None,
+        output_code_path: str = None,
         chart_type_hint: Optional[str] = None
     ) -> Dict[str, Any]:
         """
@@ -169,7 +178,7 @@ def generate_chart(
     description: str,
     data_path: Optional[str] = None,
     data_topic: Optional[str] = None,
-    output_path: str = "results/chart.html"
+    output_path: str = None
 ) -> Dict[str, Any]:
     """
     Simple interface to generate a chart.
@@ -185,7 +194,11 @@ def generate_chart(
     """
     import os
     # Ensure results folder exists
-    os.makedirs("/home/ilya/Desktop/v7labs_test/results", exist_ok=True)
+    os.makedirs(RESULTS_PATH, exist_ok=True)
+    
+    # Use default path if not specified
+    if not output_path:
+        output_path = os.path.join(RESULTS_PATH, "chart.html")
     
     agent = ChartGenerationAgent()
     

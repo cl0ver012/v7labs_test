@@ -13,13 +13,16 @@ from langchain_core.messages import SystemMessage, HumanMessage
 # Load environment variables
 load_dotenv()
 
+# Configuration
+DEFAULT_MODEL = os.getenv('CLAUDE_MODEL', 'claude-3-5-haiku-latest')
+
 
 def generate_chart_code(
     data: Dict[str, Any],
     chart_description: str,
     example_code: Optional[str] = None,
     output_file: str = "chart.html",
-    model: str = "claude-3-haiku-20240307",
+    model: Optional[str] = None,
     temperature: float = 0.3
 ) -> str:
     """
@@ -40,7 +43,7 @@ def generate_chart_code(
     
     try:
         # Initialize LLM
-        llm = ChatAnthropic(model=model, temperature=temperature)
+        llm = ChatAnthropic(model=model or DEFAULT_MODEL, temperature=temperature)
         
         # Build prompt emphasizing exact structure
         system_prompt = """You are a PyEcharts code generator.
