@@ -11,7 +11,7 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import SystemMessage, HumanMessage
 
 # Load environment variables
-load_dotenv()
+# load_dotenv()
 
 # Configuration
 DEFAULT_MODEL = os.getenv('CLAUDE_MODEL', 'claude-3-5-haiku-latest')

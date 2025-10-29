@@ -13,7 +13,7 @@ from langchain_core.messages import HumanMessage
 from chart_agent.models.agent_state import ChartAgentState, ProcessingStep
 
 # Load environment variables
-load_dotenv()
+# load_dotenv()
 
 # Configuration
 RESULTS_PATH = os.getenv('RESULTS_PATH', os.path.join(os.getcwd(), 'results'))

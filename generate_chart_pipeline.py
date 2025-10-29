@@ -20,7 +20,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+# load_dotenv()
 
 # Configuration
 GALLERY_PATH = os.getenv('GALLERY_PATH', os.path.join(os.getcwd(), 'pyecharts-gallery'))

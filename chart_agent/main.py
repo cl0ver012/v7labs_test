@@ -13,7 +13,7 @@ from chart_agent.models.agent_state import ChartAgentState, ChartRequest, Proces
 from chart_agent.core.graph import setup_chart_generation_graph
 
 # Load environment variables
-load_dotenv()
+# load_dotenv()
 
 # Configuration
 RESULTS_PATH = os.getenv('RESULTS_PATH', os.path.join(os.getcwd(), 'results'))

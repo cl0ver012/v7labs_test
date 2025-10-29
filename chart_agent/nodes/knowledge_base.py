@@ -12,7 +12,7 @@ from langchain_anthropic import ChatAnthropic
 from chart_agent.models.agent_state import ChartAgentState, ProcessingStep
 
 # Load environment variables
-load_dotenv()
+# load_dotenv()
 
 # Configuration
 DEFAULT_MODEL = os.getenv('CLAUDE_MODEL', 'claude-3-5-haiku-latest')

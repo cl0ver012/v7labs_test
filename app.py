@@ -10,7 +10,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-load_dotenv()
+# load_dotenv()
 
 # Configuration
 PROJECT_ROOT = os.getenv('PROJECT_ROOT', os.getcwd())

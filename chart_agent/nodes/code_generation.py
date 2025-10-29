@@ -11,7 +11,7 @@ from langchain_core.messages import HumanMessage
 from chart_agent.models.agent_state import ChartAgentState, ProcessingStep
 
 # Load environment variables
-load_dotenv()
+# load_dotenv()
 
 # Configuration
 PROJECT_ROOT = os.getenv('PROJECT_ROOT', os.getcwd())
