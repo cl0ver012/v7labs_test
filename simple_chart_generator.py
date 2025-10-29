@@ -52,6 +52,7 @@ CRITICAL RULES:
 1. Use ONLY these imports:
    - from pyecharts import options as opts
    - from pyecharts.charts import [ChartType]  # Line, Bar, Pie, etc.
+   - from pyecharts.globals import ThemeType  # Only if using a theme
 
 2. Follow EXACT PyEcharts gallery structure:
    - Data as simple lists (x_data = [...], y_data = [...])
@@ -59,16 +60,41 @@ CRITICAL RULES:
    - NO other imports (no pandas, no csv, etc.)
    - NO complex logic or functions
 
-3. Structure must be:
+3. THEMES - Choose an appropriate theme for visual appeal:
+   Available themes (use EXACTLY as shown):
+   - ThemeType.LIGHT (clean, minimal light theme)
+   - ThemeType.DARK (modern dark mode)
+   - ThemeType.WHITE (pure white background)
+   - ThemeType.CHALK (chalkboard style)
+   - ThemeType.ESSOS (Game of Thrones inspired)
+   - ThemeType.INFOGRAPHIC (bold infographic colors)
+   - ThemeType.MACARONS (soft pastel colors)
+   - ThemeType.PURPLE_PASSION (purple-dominated elegant)
+   - ThemeType.ROMA (classic professional)
+   - ThemeType.ROMANTIC (warm and inviting)
+   - ThemeType.SHINE (bright and vibrant)
+   - ThemeType.VINTAGE (retro-inspired)
+   - ThemeType.WALDEN (natural earth tones)
+   - ThemeType.WESTEROS (Game of Thrones inspired)
+   - ThemeType.WONDERLAND (whimsical and colorful)
+   - ThemeType.HALLOWEEN (spooky Halloween theme)
+   
+   Use themes like this:
+   ```python
+   Bar(init_opts=opts.InitOpts(theme=ThemeType.MACARONS))
+   ```
+
+4. Structure must be:
 ```python
 from pyecharts import options as opts
 from pyecharts.charts import Line  # or Bar, Pie, etc.
+from pyecharts.globals import ThemeType  # If using theme
 
 x_data = [...]
 y_data = [...]
 
 (
-    Line()  # or Bar(), Pie(), etc.
+    Line(init_opts=opts.InitOpts(theme=ThemeType.ROMANTIC))  # With theme
     .add_xaxis(x_data)
     .add_yaxis("series_name", y_data)
     .set_global_opts(
@@ -97,14 +123,25 @@ Requirements:
 3. Follow EXACT PyEcharts gallery structure
 4. Set output to: {output_file_normalized}
 5. Add title based on description
-6. NO pandas, NO csv reading, NO complex imports"""
+6. Apply an appropriate theme using ThemeType (pick from: LIGHT, DARK, WHITE, CHALK, ESSOS, INFOGRAPHIC, MACARONS, PURPLE_PASSION, ROMA, ROMANTIC, SHINE, VINTAGE, WALDEN, WESTEROS, WONDERLAND, HALLOWEEN)
+7. NO pandas, NO csv reading, NO complex imports"""
         
         # Add example if provided
         if example_code:
             user_prompt += f"""
 
 Follow this EXACT structure (but with your data):
-{example_code}"""
+{example_code}
+
+
+If Multiple examples are provided, just pick random one and generate the code based on that.
+Because when you are generating code combining multiple examples, generated chart often get confussed and didn't looks good.
+So just pick one, not the most relevant one it can be just random one and generate the code based on that.
+You can generate the code by updating the code with your data and use the random theme.
+
+And while you are generating code, use simple, short and professional title and labels for the chart.
+When it gets longer, it looks not good and professional.
+"""
         else:
             # Provide a default example structure
             user_prompt += """
@@ -182,15 +219,27 @@ def generate_fallback_code(data: Dict, description: str, output_file: str, chart
         else:
             chart_type = 'Line'
     
-    # Generate code following EXACT PyEcharts structure
+    # Select a nice theme for the chart
+    import random
+    # All available themes in PyEcharts
+    themes = ['LIGHT', 'DARK', 'WHITE', 'CHALK', 'ESSOS', 'INFOGRAPHIC', 
+              'MACARONS', 'PURPLE_PASSION', 'ROMA', 'ROMANTIC', 'SHINE', 
+              'VINTAGE', 'WALDEN', 'WESTEROS', 'WONDERLAND', 'HALLOWEEN']
+    # Prefer colorful themes over plain ones
+    colorful_themes = ['MACARONS', 'ROMANTIC', 'INFOGRAPHIC', 'SHINE', 'ROMA', 
+                      'WALDEN', 'VINTAGE', 'PURPLE_PASSION', 'WONDERLAND', 'HALLOWEEN']
+    selected_theme = random.choice(colorful_themes)
+    
+    # Generate code following EXACT PyEcharts structure with theme
     code = f'''from pyecharts import options as opts
 from pyecharts.charts import {chart_type}
+from pyecharts.globals import ThemeType
 
 x_data = {x_data!r}
 y_data = {y_data!r}
 
 (
-    {chart_type}()
+    {chart_type}(init_opts=opts.InitOpts(theme=ThemeType.{selected_theme}))
     .add_xaxis(x_data)
     .add_yaxis("", y_data)
     .set_global_opts(

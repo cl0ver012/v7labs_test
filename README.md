@@ -36,4 +36,5 @@ streamlit run app.py
 
 - 44 chart types available (Line, Bar, Pie, Scatter, etc.)
 - Automatic data generation
-- PyEcharts visualizations
+- PyEcharts visualizations with beautiful themes
+- Multiple color themes (Macarons, Romantic, Dark, Vintage, etc.)
