@@ -36,6 +36,7 @@ def get_available_chart_types(gallery_path: str = None) -> List[str]:
             if os.path.isdir(item_path) and not item.startswith('.'):
                 chart_types.append(item)
     
+    print("-------------------available chart types-------------------", chart_types)
     # Return all 44 chart types sorted
     return sorted(chart_types)
 

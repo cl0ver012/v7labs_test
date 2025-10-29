@@ -77,13 +77,14 @@ if prompt := st.chat_input("Describe the chart you want (e.g., 'Create a bar cha
     # Generate response
     with st.chat_message("assistant"):
         with st.spinner("Generating chart..."):
-            # Generate unique filenames in results folder
+            # Generate unique filenames in results folder (use absolute paths)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            chart_path = os.path.join(RESULTS_PATH, f"chart_{timestamp}.html")
-            code_path = os.path.join(RESULTS_PATH, f"chart_{timestamp}.py")
+            results_abs = os.path.abspath(RESULTS_PATH)
+            chart_path = os.path.join(results_abs, f"chart_{timestamp}.html")
+            code_path = os.path.join(results_abs, f"chart_{timestamp}.py")
             
             # Ensure results folder exists
-            os.makedirs(RESULTS_PATH, exist_ok=True)
+            os.makedirs(results_abs, exist_ok=True)
             
             try:
                 # Call the agent

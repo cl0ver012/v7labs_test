@@ -28,8 +28,9 @@ def analyze_request_node(state: ChartAgentState) -> Dict[str, Any]:
     
     request = state["request"]
     
-    # Ensure results directory exists
-    os.makedirs(RESULTS_PATH, exist_ok=True)
+    # Ensure results directory exists (use absolute path)
+    results_abs = os.path.abspath(RESULTS_PATH)
+    os.makedirs(results_abs, exist_ok=True)
     
     # Build message about the analysis
     message_content = f"""Request Analysis Complete:
@@ -84,7 +85,7 @@ def generate_data_node(state: ChartAgentState) -> Dict[str, Any]:
         import datetime
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         json_filename = f"data_{timestamp}.json"
-        json_path = os.path.join(RESULTS_PATH, json_filename)
+        json_path = os.path.abspath(os.path.join(RESULTS_PATH, json_filename))
         
         with open(json_path, 'w') as f:
             json.dump(data, f, indent=2)

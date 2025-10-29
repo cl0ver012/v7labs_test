@@ -77,11 +77,11 @@ class ChartGenerationAgent:
             Dictionary containing the results of the chart generation
         """
         # Create the request
-        # Use default paths if not specified
+        # Use default paths if not specified (use absolute paths)
         if not output_chart_path:
-            output_chart_path = os.path.join(RESULTS_PATH, "output_chart.html")
+            output_chart_path = os.path.abspath(os.path.join(RESULTS_PATH, "output_chart.html"))
         if not output_code_path:
-            output_code_path = os.path.join(RESULTS_PATH, "generated_chart.py")
+            output_code_path = os.path.abspath(os.path.join(RESULTS_PATH, "generated_chart.py"))
         
         request = ChartRequest(
             chart_description=chart_description,
@@ -193,12 +193,13 @@ def generate_chart(
         Results dictionary
     """
     import os
-    # Ensure results folder exists
-    os.makedirs(RESULTS_PATH, exist_ok=True)
+    # Ensure results folder exists (use absolute path)
+    results_abs = os.path.abspath(RESULTS_PATH)
+    os.makedirs(results_abs, exist_ok=True)
     
     # Use default path if not specified
     if not output_path:
-        output_path = os.path.join(RESULTS_PATH, "chart.html")
+        output_path = os.path.join(results_abs, "chart.html")
     
     agent = ChartGenerationAgent()
     

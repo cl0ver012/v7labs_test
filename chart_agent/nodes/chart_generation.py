@@ -45,13 +45,13 @@ def save_outputs_node(state: ChartAgentState) -> Dict[str, Any]:
     # Generate filenames with timestamp
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    # Save code file
+    # Save code file - use absolute paths
     code_filename = f"chart_{timestamp}.py"
-    code_path = os.path.join(RESULTS_PATH, code_filename)
+    code_path = os.path.abspath(os.path.join(RESULTS_PATH, code_filename))
     
-    # Update code to use correct output path
+    # Update code to use correct output path - use absolute path
     chart_filename = f"chart_{timestamp}.html"
-    chart_path = os.path.join(RESULTS_PATH, chart_filename)
+    chart_path = os.path.abspath(os.path.join(RESULTS_PATH, chart_filename))
     
     # Replace the output file path in the code
     import re
@@ -77,7 +77,7 @@ def save_outputs_node(state: ChartAgentState) -> Dict[str, Any]:
             capture_output=True,
             text=True,
             timeout=10,
-            cwd=RESULTS_PATH
+            cwd=os.path.dirname(code_path)  # Use the directory of the code file
         )
         
         if result.returncode == 0:
