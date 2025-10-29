@@ -1,0 +1,14 @@
+# Core requirements (already in requirements.txt)
+langchain
+langchain-anthropic
+anthropic
+python-dotenv
+pyecharts
+
+# Additional for PNG conversion
+selenium==4.15.0
+webdriver-manager==4.0.1
+pillow==10.1.0
+
+# Alternative PNG converter (simpler but requires system package)
+# imgkit==1.2.3  # Requires wkhtmltopdf system package

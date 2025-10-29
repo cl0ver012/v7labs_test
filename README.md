@@ -38,3 +38,19 @@ streamlit run app.py
 - Automatic data generation
 - PyEcharts visualizations with beautiful themes
 - Multiple color themes (Macarons, Romantic, Dark, Vintage, etc.)
+- Batch generation pipeline for creating 100+ charts
+- HTML to PNG conversion support
+
+## Batch Chart Generation
+
+Generate 100+ charts automatically:
+
+```bash
+# Generate charts
+python generate_chart_pipeline.py
+
+# Convert to PNG (optional)
+python convert_html_to_png.py
+```
+
+See `PIPELINE_README.md` for details.
